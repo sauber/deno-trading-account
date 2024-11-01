@@ -1,55 +1,36 @@
+import type { Instrument } from "./instrument.ts";
+
 /** Abstract class for transaction */
 export abstract class Transaction {
-  constructor(
-    public readonly text: string,
-    public readonly cash: number,
-  ) {}
+  constructor(public readonly text: string, public readonly amount: number) {}
 }
 
 /** Deposit transaction */
 export class Deposit extends Transaction {
-  constructor(public readonly amount: number) {
-    super(`Deposit ${amount}`, amount);
+  constructor(amount: number) {
+    super("Deposit", amount);
   }
 }
 
 /** Withdraw transaction */
 export class Withdraw extends Transaction {
-  constructor(public readonly amount: number) {
-    super(`Withdraw ${amount}`, -amount);
+  constructor(amount: number) {
+    super("Withdraw", amount);
   }
 }
 
-// export class Buy extends Transaction {
-//   private fee: number = 0;
-//   private readonly text: string;
+/** Open an investment position */
+export class Open extends Transaction {
+  constructor(amount: number, instrument: Instrument, price: number) {
+    const rounded = parseFloat(price.toFixed(4));
+    super(`Open ${instrument.symbol}@${rounded}`, amount);
+  }
+}
 
-//   constructor(
-//     date: DateFormat,
-//     private readonly amount: number,
-//     private readonly investor: Investor,
-//   ) {
-//     super(date);
-//     this.text = `Buy ${amount} of ${investor.UserName}`;
-//   }
-
-//   public execute(
-//     book: Book,
-//     portfolio: Portfolio,
-//     exchange: Exchange,
-//   ): boolean {
-//     const position: Position = exchange.buy(
-//       this.investor,
-//       this.date,
-//       this.amount,
-//     );
-
-//     // Is cash available?
-//     if ( this.amount > book.cash ) return false;
-
-//     this.fee = this.amount - position.value(this.date);
-//     book.add(this);
-//     portfolio.add(position);
-//     return true;
-//   }
-// }
+/** Close an investment position */
+export class Close extends Transaction {
+  constructor(amount: number, instrument: Instrument, price: number) {
+    const rounded = parseFloat(price.toFixed(4));
+    super(`Close ${instrument.symbol}@${rounded}`, amount);
+  }
+}

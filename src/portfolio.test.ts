@@ -20,9 +20,11 @@ Deno.test("Add/remove position", () => {
 
   const id: string = portfolio.add(instrument, amount, instrument.price());
   assertEquals(portfolio.length, 1);
+  assertEquals(portfolio.has(id), true);
 
   portfolio.remove(id);
   assertEquals(portfolio.length, 0);
+  assertEquals(portfolio.has(id), false);
 });
 
 Deno.test("Amount invested", () => {

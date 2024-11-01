@@ -30,6 +30,16 @@ export class Portfolio {
     return this;
   }
 
+  /** Does position of id exist */
+  public has(id: PositionID): boolean {
+    return this.positions.some((p) => p.id == id);
+  }
+
+  /** Lookup position */
+  public position(id: PositionID): Position|undefined {
+    return this.positions.find((p) => p.id == id);
+  }
+
   /** Total amount invested in positions */
   public get invested(): number {
     let sum = 0;
@@ -43,7 +53,7 @@ export class Portfolio {
   public profit(time: Date = new Date()): number {
     let sum = 0;
     for (const position of this.positions) {
-      sum += position.profit(time)
+      sum += position.profit(time);
     }
     return sum;
   }

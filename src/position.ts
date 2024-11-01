@@ -5,9 +5,9 @@ export type PositionID = string;
 
 export class Position {
   constructor(
-    private readonly instrument: Instrument,
-    private readonly amount: number,
-    private readonly price: number,
+    public readonly instrument: Instrument,
+    public readonly amount: number,
+    public readonly price: number,
     private readonly time: Date = new Date(),
     public readonly id: PositionID = nanoid(6)
   ) {}
@@ -19,17 +19,15 @@ export class Position {
 
   /** Current unrealized value */
   public value(time: Date = new Date()): number {
-    const price = this.instrument.price(time);
-    const opening = this.price;
-    const gain = price / opening;
-    const amount = this.amount;
-    const result = amount * gain;
-    console.log({ price, opening, gain, amount, result });
-    // return this.amount * (this.instrument.price(time) / this.price);
+    const closing: number = this.instrument.price(time);
+    const opening: number = this.price;
+    const gain: number = closing / opening;
+    const amount: number = this.amount;
+    const result: number = amount * gain;
     return result;
   }
 
-  /** Current unrealized value */
+  /** Current unrealized profit */
   public profit(time: Date = new Date()): number {
     return this.value(time) - this.invested;
   }
