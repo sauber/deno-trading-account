@@ -1,8 +1,8 @@
 import { assertEquals, assertInstanceOf, assertNotEquals } from "@std/assert";
 import { Account } from "./account.ts";
 import { instrument } from "./testdata.ts";
-import { RandomInstrument } from "./instrument.ts";
-import { PositionID } from "./position.ts";
+import type { RandomInstrument } from "./instrument.ts";
+import type { PositionID } from "./position.ts";
 
 Deno.test("Instance", () => {
   const account = new Account();
@@ -39,7 +39,7 @@ Deno.test("Open", () => {
   const amount = 100;
   const account = new Account(start);
   const inst: RandomInstrument = instrument();
-  const id: PositionID|false = account.open(amount, inst, inst.price());
+  const id: PositionID | false = account.open(amount, inst, inst.price());
   assertNotEquals(id, "");
   assertEquals(account.saldo.cash, start - amount);
 });
@@ -49,7 +49,7 @@ Deno.test("Open exceeds funds", () => {
   const amount = 2001;
   const account = new Account(start);
   const inst: RandomInstrument = instrument();
-  const id: PositionID|false = account.open(amount, inst, inst.price());
+  const id: PositionID | false = account.open(amount, inst, inst.price());
   assertEquals(id, false);
   assertEquals(account.saldo.cash, start);
 });

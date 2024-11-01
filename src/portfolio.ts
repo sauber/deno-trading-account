@@ -16,7 +16,7 @@ export class Portfolio {
     instrument: Instrument,
     amount: number,
     price: number,
-    time: Date = new Date()
+    time: Date = new Date(),
   ): PositionID {
     const position = new Position(instrument, amount, price, time);
     this.positions.push(position);
@@ -36,7 +36,7 @@ export class Portfolio {
   }
 
   /** Lookup position */
-  public position(id: PositionID): Position|undefined {
+  public position(id: PositionID): Position | undefined {
     return this.positions.find((p) => p.id == id);
   }
 

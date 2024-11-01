@@ -1,5 +1,5 @@
-import { assertNotEquals, assertEquals, assertInstanceOf } from "@std/assert";
-import { RandomInstrument, Instrument } from "./instrument.ts";
+import { assertEquals, assertInstanceOf, assertNotEquals } from "@std/assert";
+import { Instrument, RandomInstrument } from "./instrument.ts";
 
 Deno.test("Instance", () => {
   const i = new RandomInstrument();

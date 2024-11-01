@@ -1,9 +1,9 @@
 import {
-  assertNotEquals,
   assertEquals,
-  assertInstanceOf,
   assertGreater,
+  assertInstanceOf,
   assertLess,
+  assertNotEquals,
 } from "@std/assert";
 import { Portfolio } from "./portfolio.ts";
 import { RandomInstrument } from "./instrument.ts";

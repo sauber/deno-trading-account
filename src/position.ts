@@ -9,7 +9,7 @@ export class Position {
     public readonly amount: number,
     public readonly price: number,
     private readonly time: Date = new Date(),
-    public readonly id: PositionID = nanoid(6)
+    public readonly id: PositionID = nanoid(6),
   ) {}
 
   /** Original amount invested */

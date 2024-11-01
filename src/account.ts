@@ -1,7 +1,13 @@
-import { Instrument } from "./instrument.ts";
+import type { Instrument } from "./instrument.ts";
 import { Portfolio } from "./portfolio.ts";
-import { PositionID } from "./position.ts";
-import { type Transaction, Close, Deposit, Open, Withdraw } from "./transaction.ts";
+import type { PositionID } from "./position.ts";
+import {
+  Close,
+  Deposit,
+  Open,
+  type Transaction,
+  Withdraw,
+} from "./transaction.ts";
 
 // Cash and invested amount after each transaction
 type Saldo = {
@@ -59,7 +65,7 @@ export class Account {
     amount: number,
     instrument: Instrument,
     price: number,
-    time: Date = new Date()
+    time: Date = new Date(),
   ): PositionID | false {
     // Cannot open unfunded position
     if (amount > this.saldo.cash) return false;
@@ -74,15 +80,19 @@ export class Account {
   }
 
   /* Close a position */
-  public close(id: PositionID, price: number, time: Date = new Date()): boolean {
+  public close(
+    id: PositionID,
+    price: number,
+    time: Date = new Date(),
+  ): boolean {
     const position = this.portfolio.position(id);
-    if ( ! position ) return false;
-    const amount = position.amount * price / position.price;
+    if (!position) return false;
+    const amount = (position.amount * price) / position.price;
     const saldo: Saldo = this.saldo;
     saldo.cash += amount;
     saldo.invested -= position.invested;
     const transaction = new Close(amount, position.instrument, price);
-    this.journal.push({transaction, saldo, time});
+    this.journal.push({ transaction, saldo, time });
     return true;
   }
 }
