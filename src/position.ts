@@ -1,4 +1,3 @@
-import { nanoid } from "nanoid";
 import type { Instrument } from "./instrument.ts";
 
 export type PositionID = string;
@@ -8,8 +7,6 @@ export class Position {
     public readonly instrument: Instrument,
     public readonly amount: number,
     public readonly price: number,
-    private readonly time: Date = new Date(),
-    public readonly id: PositionID = nanoid(6),
   ) {}
 
   /** Original amount invested */

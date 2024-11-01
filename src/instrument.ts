@@ -4,7 +4,9 @@ import { nanoid } from "nanoid";
 export abstract class Instrument {
   constructor(public readonly symbol: string) {}
 
-  public abstract price(time: Date): number;
+  public price(_time: Date = new Date()): number {
+    return 0;
+  }
 }
 
 /** An instrument with a random symbol and random price */
@@ -20,7 +22,7 @@ export class RandomInstrument extends Instrument {
   }
 
   /** Price of instrument now, or at time */
-  public price(_time: Date = new Date()): number {
+  public override price(): number {
     // A random price +/- 10% form base
     const cur: number = 0.9 * this.base + Math.random() * this.base * 0.2;
     return cur;

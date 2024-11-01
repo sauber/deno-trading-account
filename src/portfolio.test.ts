@@ -6,7 +6,8 @@ import {
   assertNotEquals,
 } from "@std/assert";
 import { Portfolio } from "./portfolio.ts";
-import { RandomInstrument } from "./instrument.ts";
+import { Position } from "./position.ts";
+import { makePosition } from "./testdata.ts";
 
 Deno.test("Instance", () => {
   const p = new Portfolio();
@@ -15,45 +16,37 @@ Deno.test("Instance", () => {
 
 Deno.test("Add/remove position", () => {
   const portfolio = new Portfolio();
-  const instrument = new RandomInstrument();
-  const amount = 100;
-
-  const id: string = portfolio.add(instrument, amount, instrument.price());
+  const position: Position = makePosition(100);
+  portfolio.add(position);
   assertEquals(portfolio.length, 1);
-  assertEquals(portfolio.has(id), true);
+  assertEquals(portfolio.has(position), true);
 
-  portfolio.remove(id);
+  portfolio.remove(position);
   assertEquals(portfolio.length, 0);
-  assertEquals(portfolio.has(id), false);
+  assertEquals(portfolio.has(position), false);
 });
 
 Deno.test("Amount invested", () => {
   const portfolio = new Portfolio();
-  const instrument = new RandomInstrument();
   const amount = 100;
-
-  portfolio.add(instrument, amount, instrument.price());
-  portfolio.add(instrument, amount, instrument.price());
+  portfolio.add(makePosition(amount));
+  portfolio.add(makePosition(amount));
   assertEquals(portfolio.invested, 2 * amount);
 });
 
 Deno.test("Profit", () => {
   const portfolio = new Portfolio();
-  const instrument = new RandomInstrument();
   const amount = 100;
-
-  portfolio.add(instrument, amount, instrument.price());
-  portfolio.add(instrument, amount, instrument.price());
+  portfolio.add(makePosition(amount));
+  portfolio.add(makePosition(amount));
   assertNotEquals(portfolio.profit(), 0);
 });
 
 Deno.test("Value", () => {
   const portfolio = new Portfolio();
-  const instrument = new RandomInstrument();
   const amount = 100;
-
-  portfolio.add(instrument, amount, instrument.price());
-  portfolio.add(instrument, amount, instrument.price());
+  portfolio.add(makePosition(amount));
+  portfolio.add(makePosition(amount));
   const value = portfolio.value();
   assertGreater(value, 1.6 * amount);
   assertLess(value, 2.4 * amount);

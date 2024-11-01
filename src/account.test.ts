@@ -1,8 +1,6 @@
-import { assertEquals, assertInstanceOf, assertNotEquals } from "@std/assert";
+import { assertEquals, assertInstanceOf } from "@std/assert";
 import { Account } from "./account.ts";
-import { instrument } from "./testdata.ts";
-import type { RandomInstrument } from "./instrument.ts";
-import type { PositionID } from "./position.ts";
+import { makePosition } from "./testdata.ts";
 
 Deno.test("Instance", () => {
   const account = new Account();
@@ -12,16 +10,16 @@ Deno.test("Instance", () => {
 Deno.test("Open with amount", () => {
   const cash = 1000;
   const account = new Account(cash);
-  assertEquals(account.saldo.cash, cash);
+  assertEquals(account.balance, cash);
 });
 
 Deno.test("Deposits", () => {
   const amount = 100;
   const account = new Account();
   account.deposit(amount);
-  assertEquals(account.saldo.cash, amount);
+  assertEquals(account.balance, amount);
   account.deposit(amount);
-  assertEquals(account.saldo.cash, 2 * amount);
+  assertEquals(account.balance, 2 * amount);
 });
 
 Deno.test("Withdrawals", () => {
@@ -29,38 +27,37 @@ Deno.test("Withdrawals", () => {
   const amount = 100;
   const account = new Account(open);
   account.withdraw(amount);
-  assertEquals(account.saldo.cash, open - amount);
+  assertEquals(account.balance, open - amount);
   account.withdraw(amount);
-  assertEquals(account.saldo.cash, open - 2 * amount);
+  assertEquals(account.balance, open - 2 * amount);
 });
 
 Deno.test("Open", () => {
   const start = 2000;
   const amount = 100;
   const account = new Account(start);
-  const inst: RandomInstrument = instrument();
-  const id: PositionID | false = account.open(amount, inst, inst.price());
-  assertNotEquals(id, "");
-  assertEquals(account.saldo.cash, start - amount);
+  const pos = makePosition(amount);
+  const success: boolean = account.add(pos, amount);
+  assertEquals(success, true);
+  assertEquals(account.balance, start - amount);
 });
 
 Deno.test("Open exceeds funds", () => {
   const start = 2000;
   const amount = 2001;
   const account = new Account(start);
-  const inst: RandomInstrument = instrument();
-  const id: PositionID | false = account.open(amount, inst, inst.price());
-  assertEquals(id, false);
-  assertEquals(account.saldo.cash, start);
+  const pos = makePosition(amount);
+  const success: boolean = account.add(pos, amount);
+  assertEquals(success, false);
+  assertEquals(account.balance, start);
 });
 
 Deno.test("Close", () => {
   const start = 2000;
   const amount = 100;
   const account = new Account(start);
-  const inst: RandomInstrument = instrument();
-  const opening: number = inst.price();
-  const id = account.open(amount, inst, opening) as PositionID;
-  account.close(id, opening);
-  assertEquals(account.saldo.cash, start);
+  const pos = makePosition(amount);
+  account.add(pos, amount);
+  account.remove(pos, amount);
+  assertEquals(account.balance, start);
 });

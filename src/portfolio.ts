@@ -1,10 +1,9 @@
-import type { Instrument } from "./instrument.ts";
-import { Position, type PositionID } from "./position.ts";
+import type { Position } from "./position.ts";
 
 /** A collection of instruments */
 export class Portfolio {
   /* Open a portfolio optionally with number of positions */
-  constructor(private readonly positions: Array<Position> = []) {}
+  constructor(public readonly positions: Array<Position> = []) {}
 
   /** Count of positions in portfolio */
   public get length(): number {
@@ -12,36 +11,25 @@ export class Portfolio {
   }
 
   /** Add a position to portfolio */
-  public add(
-    instrument: Instrument,
-    amount: number,
-    price: number,
-    time: Date = new Date(),
-  ): PositionID {
-    const position = new Position(instrument, amount, price, time);
+  public add(position: Position): void {
     this.positions.push(position);
-    return position.id;
   }
 
   /** Remove a position from portfolio */
-  public remove(id: PositionID): Portfolio {
-    const index = this.positions.findIndex((p) => p.id == id);
-    if (index >= 0) this.positions.splice(index, 1);
-    return this;
+  public remove(position: Position): void {
+    this.positions.forEach((item, index, array) => {
+      if (item === position) array.splice(index, 1);
+    });
   }
 
-  /** Does position of id exist */
-  public has(id: PositionID): boolean {
-    return this.positions.some((p) => p.id == id);
-  }
-
-  /** Lookup position */
-  public position(id: PositionID): Position | undefined {
-    return this.positions.find((p) => p.id == id);
+  /** Does position exist */
+  public has(position: Position): boolean {
+    return this.positions.some((item) => item === position);
   }
 
   /** Total amount invested in positions */
   public get invested(): number {
+    // values.reduce((total: number, a: number) => total + a, 0);
     let sum = 0;
     for (const position of this.positions) {
       sum += position.invested;

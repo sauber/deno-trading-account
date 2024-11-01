@@ -1,4 +1,4 @@
-import { RandomInstrument } from "./instrument.ts";
+import { type Instrument, RandomInstrument } from "./instrument.ts";
 import { Position } from "./position.ts";
 
 /** An exchange of random instruments */
@@ -14,7 +14,7 @@ export class Exchange {
   }
 
   /** Buy instrument for a fee at spread higher than price */
-  public buy(amount: number, instrument: Instrument): Position {
+  public buy(instrument: Instrument, amount: number): Position {
     amount -= amount * this.fee;
     const price: number = instrument.price() * (1 + this.spread);
     return new Position(instrument, amount, price);

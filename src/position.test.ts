@@ -12,10 +12,6 @@ Deno.test("Instance", () => {
   assertInstanceOf(p, Position);
 });
 
-Deno.test("ID", () => {
-  const p = new Position(new RandomInstrument(), 0, 0);
-  assertGreater(p.id.length, 0);
-});
 
 Deno.test("Invested", () => {
   const amount = 100;

@@ -1,27 +1,21 @@
-import type { Instrument } from "./instrument.ts";
 import { Portfolio } from "./portfolio.ts";
-import type { PositionID } from "./position.ts";
-import {
-  Close,
-  Deposit,
-  Open,
-  type Transaction,
-  Withdraw,
-} from "./transaction.ts";
+import type { Position } from "./position.ts";
 
-// Cash and invested amount after each transaction
-type Saldo = {
+type Transaction = {
+  time: Date;
+  summary: string;
+  amount: number;
+  position?: Position;
   cash: number;
   invested: number;
 };
 
-type Entry = {
-  transaction: Transaction;
-  saldo: Saldo;
-  time: Date;
+type Init = {
+  cash: 0;
+  invested: 0;
 };
 
-type Journal = Array<Entry>;
+type Journal = Array<Transaction>;
 
 /** Journal of transactions */
 export class Account {
@@ -34,65 +28,92 @@ export class Account {
   }
 
   /** Most recent entry in journal */
-  private get last(): Entry {
+  private get last(): Transaction | Init {
+    if (this.journal.length <= 0) return { cash: 0, invested: 0 };
     return this.journal[this.journal.length - 1];
   }
 
-  /** Copy of most recent saldo */
-  public get saldo(): Saldo {
-    if (this.journal.length < 1) return { cash: 0, invested: 0 };
-    return { ...this.last.saldo };
+  /** Amount of available funds */
+  public get balance(): number {
+    return this.last.cash;
   }
 
   /** Deposit an amount to account */
   public deposit(amount: number, time: Date = new Date()) {
-    const transaction = new Deposit(amount);
-    const saldo: Saldo = this.saldo;
-    saldo.cash += amount;
-    this.journal.push({ transaction, saldo, time });
+    const prev = this.last;
+    const transaction: Transaction = {
+      time,
+      summary: "Deposit",
+      amount,
+      cash: prev.cash + amount,
+      invested: prev.invested,
+    };
+    this.journal.push(transaction);
   }
 
   /** Deposit an amount to account */
   public withdraw(amount: number, time: Date = new Date()) {
-    const transaction = new Withdraw(amount);
-    const saldo: Saldo = this.saldo;
-    saldo.cash -= amount;
-    this.journal.push({ transaction, saldo, time });
+    const prev = this.last;
+    const transaction: Transaction = {
+      time,
+      summary: "Withdraw",
+      amount,
+      cash: prev.cash - amount,
+      invested: prev.invested,
+    };
+    this.journal.push(transaction);
   }
 
-  /** Open a position in an instrument */
-  public open(
+  /** Add position to portfolio, deduct payment from cash */
+  public add(
+    position: Position,
     amount: number,
-    instrument: Instrument,
-    price: number,
-    time: Date = new Date(),
-  ): PositionID | false {
+    time: Date = new Date()
+  ): boolean {
     // Cannot open unfunded position
-    if (amount > this.saldo.cash) return false;
+    const prev = this.last;
+    if (amount > prev.cash) return false;
 
-    const transaction = new Open(amount, instrument, price);
-    const saldo: Saldo = this.saldo;
-    saldo.cash -= amount;
-    saldo.invested += amount;
-    const id: PositionID = this.portfolio.add(instrument, amount, price, time);
-    this.journal.push({ transaction, saldo, time });
-    return id;
+    this.portfolio.add(position);
+    const transaction: Transaction = {
+      time,
+      summary: `Open ${position.instrument.symbol}`,
+      amount,
+      position,
+      cash: prev.cash - amount,
+      invested: prev.invested + position.invested,
+    };
+    this.journal.push(transaction);
+
+    return true;
   }
 
-  /* Close a position */
-  public close(
-    id: PositionID,
-    price: number,
-    time: Date = new Date(),
+  /** Remove position from portfolio, add return to cash */
+  public remove(
+    position: Position,
+    amount: number,
+    time: Date = new Date()
   ): boolean {
-    const position = this.portfolio.position(id);
-    if (!position) return false;
-    const amount = (position.amount * price) / position.price;
-    const saldo: Saldo = this.saldo;
-    saldo.cash += amount;
-    saldo.invested -= position.invested;
-    const transaction = new Close(amount, position.instrument, price);
-    this.journal.push({ transaction, saldo, time });
+    // Only close if actually in portfolio
+    if (!this.portfolio.has(position)) return false;
+
+    this.portfolio.remove(position);
+    const prev = this.last;
+    const transaction: Transaction = {
+      time,
+      summary: `Close ${position.instrument.symbol}`,
+      amount,
+      position,
+      cash: prev.cash + amount,
+      invested: prev.invested - position.invested,
+    };
+    this.journal.push(transaction);
+
     return true;
+  }
+
+  /** Copy of positions */
+  public get positions(): Array<Position> {
+    return [...this.portfolio.positions];
   }
 }
