@@ -14,17 +14,20 @@ export class Exchange {
   }
 
   /** Buy instrument for a fee at spread higher than price */
-  public buy(instrument: Instrument, amount: number): Position {
+  public buy(instrument: Instrument, amount: number, time: Date = new Date()): Position {
     amount -= amount * this.fee;
-    const price: number = instrument.price() * (1 + this.spread);
+    const price: number = instrument.price(time) * (1 + this.spread);
     return new Position(instrument, amount, price);
   }
 
   /** Sell position for a fee at spread lower than price */
-  public sell(position: Position): number {
-    const price: number = position.price * (1 - this.spread);
-    const gain = price / position.price;
-    const fee = gain * this.fee;
-    return gain - fee;
+  public sell(position: Position, time: Date = new Date()): number {
+    // const openingPrice: number = position.price * (1 - this.spread);
+    // const sellingPrice: number = position.instrument.price(time) * (1+this.spread);
+    // const gain = sellingPrice / openingPrice;
+    const value: number = position.value(time);
+    const amount = value * (1-this.spread);
+    const fee = amount * this.fee;
+    return amount-fee;
   }
 }

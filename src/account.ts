@@ -1,3 +1,4 @@
+import { Table } from "@sauber/table";
 import { Portfolio } from "./portfolio.ts";
 import type { Position } from "./position.ts";
 
@@ -6,8 +7,8 @@ type Transaction = {
   summary: string;
   amount: number;
   position?: Position;
-  cash: number;
   invested: number;
+  cash: number;
 };
 
 type Init = {
@@ -45,8 +46,8 @@ export class Account {
       time,
       summary: "Deposit",
       amount,
-      cash: prev.cash + amount,
       invested: prev.invested,
+      cash: prev.cash + amount,
     };
     this.journal.push(transaction);
   }
@@ -58,8 +59,8 @@ export class Account {
       time,
       summary: "Withdraw",
       amount,
-      cash: prev.cash - amount,
       invested: prev.invested,
+      cash: prev.cash - amount,
     };
     this.journal.push(transaction);
   }
@@ -77,11 +78,11 @@ export class Account {
     this.portfolio.add(position);
     const transaction: Transaction = {
       time,
-      summary: `Open ${position.instrument.symbol}`,
+      summary: "Open",
       amount,
       position,
-      cash: prev.cash - amount,
       invested: prev.invested + position.invested,
+      cash: prev.cash - amount,
     };
     this.journal.push(transaction);
 
@@ -101,11 +102,11 @@ export class Account {
     const prev = this.last;
     const transaction: Transaction = {
       time,
-      summary: `Close ${position.instrument.symbol}`,
+      summary: "Close",
       amount,
       position,
-      cash: prev.cash + amount,
       invested: prev.invested - position.invested,
+      cash: prev.cash + amount,
     };
     this.journal.push(transaction);
 
@@ -115,5 +116,36 @@ export class Account {
   /** Copy of positions */
   public get positions(): Array<Position> {
     return [...this.portfolio.positions];
+  }
+
+  /** Value if positions and balance */
+  public value(time: Date = new Date()): number {
+    return this.balance + this.portfolio.value(time);
+  }
+
+  /** A printable statement */
+  public get statement(): string {
+    const money = (v): number => parseFloat(v.toFixed(2));
+    const table = new Table();
+    table.title = "Transactions";
+    table.headers = [
+      "Date",
+      "Action",
+      "Symbol",
+      "Price",
+      "Amount",
+      "Invested",
+      "Cash",
+    ];
+    table.rows = this.journal.map((t) => [
+      t.time.toLocaleDateString(),
+      t.summary,
+      t.position ? t.position.instrument.symbol : "",
+      t.position ? money(t.price) : "",
+      money(t.amount),
+      money(t.invested),
+      money(t.cash),
+    ]);
+    return table.toString();
   }
 }

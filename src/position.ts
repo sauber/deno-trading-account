@@ -6,6 +6,7 @@ export class Position {
   constructor(
     public readonly instrument: Instrument,
     public readonly amount: number,
+    // TODO: Keep count of units instead. Don't care which price was paid or paid-out.
     public readonly price: number,
   ) {}
 

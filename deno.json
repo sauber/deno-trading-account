@@ -8,6 +8,7 @@
     "include": ["LICENSE", "README.md", "mod.ts", "example.ts", "src/*.ts"]
   },
   "imports": {
+    "@sauber/table": "jsr:@sauber/table@^0.1.0",
     "@std/assert": "jsr:@std/assert@^1.0.6",
     "nanoid": "npm:nanoid@^5.0.8"
   }
