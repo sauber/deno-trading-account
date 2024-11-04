@@ -24,7 +24,7 @@ export class Account {
   private readonly journal: Journal = [];
 
   /** Collection of positions */
-  public readonly portfolio = new Portfolio();
+  public readonly portfolio: Portfolio = new Portfolio();
 
   /** Optionally deposit an amount at account opening */
   constructor(deposit: number = 0, time: Date = new Date()) {
