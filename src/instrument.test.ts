@@ -15,3 +15,8 @@ Deno.test("Price", () => {
   const i = new RandomInstrument();
   assertNotEquals(i.price(), 0);
 });
+
+Deno.test("Active", () => {
+  const i = new RandomInstrument();
+  assertEquals(i.active(), true);
+});
