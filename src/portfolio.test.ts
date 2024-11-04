@@ -6,7 +6,7 @@ import {
   assertNotEquals,
 } from "@std/assert";
 import { Portfolio } from "./portfolio.ts";
-import { Position } from "./position.ts";
+import type { Position } from "./position.ts";
 import { makePosition } from "./testdata.ts";
 
 Deno.test("Instance", () => {
@@ -50,4 +50,14 @@ Deno.test("Value", () => {
   const value = portfolio.value();
   assertGreater(value, 1.6 * amount);
   assertLess(value, 2.4 * amount);
+});
+
+Deno.test("Statement", () => {
+  const portfolio = new Portfolio();
+  const amount = 100;
+  portfolio.add(makePosition(amount));
+  portfolio.add(makePosition(amount));
+
+  const printable = portfolio.statement;
+  assertGreater(printable.length, 0);
 });

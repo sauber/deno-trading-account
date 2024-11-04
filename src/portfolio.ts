@@ -1,3 +1,4 @@
+import { Table } from "@sauber/table";
 import type { Position } from "./position.ts";
 
 /** A collection of instruments */
@@ -53,5 +54,36 @@ export class Portfolio {
       sum += position.value(time);
     }
     return sum;
+  }
+
+  /** Printable statement */
+  public get statement(): string {
+    const money = (v: number): number => parseFloat(v.toFixed(2));
+    const now: Date = new Date();
+    const t = new Table();
+    // t.title = "Positions";
+    t.headers = ["Date", "Symbol", "Price", "Units", "Invested", "Profit", "Value"];
+    let invested = 0;
+    let profit = 0;
+    let value = 0;
+    t.rows = this.positions.map(p=>{
+      const positionValue = p.value(now);
+
+      // Summary
+      value += positionValue;
+      invested += p.invested;
+      profit += positionValue - p.invested;
+
+      return [
+      now.toLocaleDateString(),
+      p.instrument.symbol,
+      money(p.price),
+      p.units.toFixed(4),
+      money(p.invested),
+      money(positionValue - p.invested),
+      money(positionValue),
+    ]});
+    t.title = `Portfolio position=${this.positions.length}, invested=${money(invested)}, profit=${money(profit)}, value=${money(value)}`;
+    return t.toString();
   }
 }

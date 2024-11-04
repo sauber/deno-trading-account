@@ -1,31 +1,28 @@
 import type { Instrument } from "./instrument.ts";
 
-export type PositionID = string;
-
 export class Position {
+  /**
+   * @param instrument - Instrument of investment
+   * @param units - Count of units of instrument
+   * @param price - Purchase price of one instrument unit
+   */
   constructor(
     public readonly instrument: Instrument,
-    public readonly amount: number,
-    // TODO: Keep count of units instead. Don't care which price was paid or paid-out.
-    public readonly price: number,
+    public readonly units: number,
+    public readonly price: number
   ) {}
 
   /** Original amount invested */
   public get invested(): number {
-    return this.amount;
+    return this.units * this.price;
   }
 
-  /** Current unrealized value */
+  /** Value of investment at time */
   public value(time: Date = new Date()): number {
-    const closing: number = this.instrument.price(time);
-    const opening: number = this.price;
-    const gain: number = closing / opening;
-    const amount: number = this.amount;
-    const result: number = amount * gain;
-    return result;
+    return this.units * this.instrument.price(time);
   }
 
-  /** Current unrealized profit */
+  /** Profit of investment at time */
   public profit(time: Date = new Date()): number {
     return this.value(time) - this.invested;
   }

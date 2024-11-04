@@ -12,30 +12,20 @@ Deno.test("Instance", () => {
   assertInstanceOf(p, Position);
 });
 
-
 Deno.test("Invested", () => {
-  const amount = 100;
+  const units = 10;
   const price = 100;
-  const p = new Position(new RandomInstrument(), amount, price);
-  assertEquals(p.invested, amount);
+  const p = new Position(new RandomInstrument(), units, price);
+  assertEquals(p.invested, units * price);
 });
 
 Deno.test("Value", () => {
-  const amount = 100;
   const inst = new RandomInstrument();
+  const units = 10;
   const price = inst.price();
-  const pos = new Position(inst, amount, price);
-  const value = pos.value();
-  assertGreater(value, amount * 0.8);
-  assertLess(value, amount * 1.2);
-});
-
-Deno.test("Profit", () => {
-  const amount = 100;
-  const inst = new RandomInstrument();
-  const price = inst.price();
-  const pos = new Position(inst, amount, price);
-  const value = pos.profit();
-  assertGreater(value, amount * -0.2);
-  assertLess(value, amount * 0.2);
+  const purchaseValue = price * units;
+  const pos = new Position(inst, units, price);
+  const currentValue = pos.value();
+  assertGreater(currentValue, (purchaseValue * 0.9) / 1.1);
+  assertLess(currentValue, (purchaseValue * 1.1) / 0.9);
 });

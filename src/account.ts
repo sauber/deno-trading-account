@@ -7,6 +7,7 @@ type Transaction = {
   summary: string;
   amount: number;
   position?: Position;
+  price?: number;
   invested: number;
   cash: number;
 };
@@ -21,7 +22,7 @@ type Journal = Array<Transaction>;
 /** Journal of transactions */
 export class Account {
   private readonly journal: Journal = [];
-  private readonly portfolio = new Portfolio();
+  public readonly portfolio = new Portfolio();
 
   /** Optionally deposit an amount at account opening */
   constructor(deposit: number = 0, time: Date = new Date()) {
@@ -81,6 +82,7 @@ export class Account {
       summary: "Open",
       amount,
       position,
+      price: amount / position.units,
       invested: prev.invested + position.invested,
       cash: prev.cash - amount,
     };
@@ -105,6 +107,7 @@ export class Account {
       summary: "Close",
       amount,
       position,
+      price: amount / position.units,
       invested: prev.invested - position.invested,
       cash: prev.cash + amount,
     };
@@ -125,7 +128,7 @@ export class Account {
 
   /** A printable statement */
   public get statement(): string {
-    const money = (v): number => parseFloat(v.toFixed(2));
+    const money = (v: number): number => parseFloat(v.toFixed(2));
     const table = new Table();
     table.title = "Transactions";
     table.headers = [
@@ -141,7 +144,7 @@ export class Account {
       t.time.toLocaleDateString(),
       t.summary,
       t.position ? t.position.instrument.symbol : "",
-      t.position ? money(t.price) : "",
+      t.price ? money(t.price) : "",
       money(t.amount),
       money(t.invested),
       money(t.cash),
