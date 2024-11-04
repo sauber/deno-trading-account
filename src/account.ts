@@ -22,6 +22,8 @@ type Journal = Array<Transaction>;
 /** Journal of transactions */
 export class Account {
   private readonly journal: Journal = [];
+
+  /** Collection of positions */
   public readonly portfolio = new Portfolio();
 
   /** Optionally deposit an amount at account opening */
